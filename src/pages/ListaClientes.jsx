@@ -26,13 +26,17 @@ useEffect(() => {
   cargarClientes();
 }, []);
 
+  const handleClienteCreado = (nuevoCliente) => {
+    setClientes((prevClientes) => [nuevoCliente, ...prevClientes]);
+  };
+
   const clientesFiltrados = clientes.filter(
     (cliente) =>
-      cliente.name.lastname
-        .toLowerCase()
+      cliente.name?.lastname
+        ?.toLowerCase()
         .includes(busqueda.toLowerCase()) ||
-      cliente.address.city
-        .toLowerCase()
+      cliente.address?.city
+        ?.toLowerCase()
         .includes(busqueda.toLowerCase())
   );
 
@@ -48,7 +52,7 @@ useEffect(() => {
     <div className="clientes-container">
 
       <h1>Clientes</h1>
-      <FormCliente />
+      <FormCliente onClienteCreado={handleClienteCreado} />
 
       <hr />
 
@@ -92,14 +96,14 @@ useEffect(() => {
               <td>{cliente.id}</td>
 
               <td>
-                {cliente.name.firstname} {cliente.name.lastname}
+                {cliente.name?.firstname} {cliente.name?.lastname}
               </td>
 
               <td>{cliente.email}</td>
 
               <td>{cliente.phone}</td>
 
-              <td>{cliente.address.city}</td>
+              <td>{cliente.address?.city}</td>
 
               <td>
                 <Link
