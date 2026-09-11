@@ -14,6 +14,16 @@ const FormCliente = () => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const generarPasswordAleatoria = (longitud = 8) => { //genera contraseña maxima de 8 caracteres
+        const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+        let password = '';
+        for (let i = 0; i < longitud; i++) { //repite 8 veces
+            const posicionAleatoria = Math.floor(Math.random() * caracteres.length); //elige una posicion aleatoria
+            password += caracteres.charAt(posicionAleatoria); //agrega el caracter aleatorio a la contraseña
+        }
+        return password;
+    };
+
     const manejarSubmit = async (e) => {
 
         e.preventDefault();
@@ -39,7 +49,7 @@ const FormCliente = () => {
 
             username: nombre.toLowerCase().replace(/\s/g, ""),
 
-            password: "1234",
+            password: generarPasswordAleatoria(8),
 
             name: {
                 firstname: nombre,

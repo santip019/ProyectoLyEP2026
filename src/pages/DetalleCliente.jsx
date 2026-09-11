@@ -40,10 +40,11 @@ const DetalleCliente = () => {
     return <h2>Cargando cliente...</h2>;
   }
 
+  const enmascarar = (str) => '•'.repeat(str?.length || 8); //crea una mascara de puntos para la contraseña y que tenga un minimo de 8 caracteres
+
   return (
     <div className="detalle-cliente">
       <h1>Ficha del Cliente</h1>
-      <p>Rol actual: {role}</p>
 
       {mensaje && <p className = 'mensaje-eliminado'>{mensaje}</p>}
 
@@ -89,7 +90,7 @@ const DetalleCliente = () => {
       </p>
 
       <p>
-        <strong>Contraseña:</strong> {cliente.password}
+        <strong>Contraseña:</strong> {enmascarar(cliente.password)}
       </p>
 
       {role?.trim() === "Gerencia" && (
