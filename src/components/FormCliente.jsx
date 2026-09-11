@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import clientesService from "../services/clientesService";
 
-const FormCliente = () => {
+const FormCliente = ({ onClienteCreado }) => {
 
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");
@@ -71,6 +71,15 @@ const FormCliente = () => {
                 await clientesService.crearCliente(
                     nuevoCliente
                 );
+
+            const clienteCreado = {
+                ...nuevoCliente,
+                id: respuesta?.id || Date.now()
+            };
+
+            if (typeof onClienteCreado === "function") {
+                onClienteCreado(clienteCreado);
+            }
 
             setMensaje(
                 `Cliente creado correctamente. ID: ${respuesta.id}`
