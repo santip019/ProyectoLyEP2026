@@ -12,7 +12,19 @@ const getClientes = async () => {
     return respuesta.data;
 };
 
+const getClientePorId = async (id) => {
+  const respuesta = await axios.get(`${URL}/${id}`);
+  return respuesta.data;
+};
+
+const eliminarCliente = async (id) => {
+    const respuesta = await axios.delete(`${URL}/${id}`);
+    return respuesta.data;
+};
+
 export default {
     crearCliente,
-    getClientes
+    getClientes,
+    getClientePorId,
+    eliminarCliente
 };
