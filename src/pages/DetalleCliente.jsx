@@ -10,7 +10,6 @@ const DetalleCliente = () => {
 
   const [cliente, setCliente] = useState(null);
   const [mensaje, setMensaje] = useState("");
-  const [mensajeError, setMensajeError] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -32,22 +31,17 @@ const DetalleCliente = () => {
   }, [id]);
 
   const eliminarCliente = async () => {
-    if (role?.trim() !== "Gerencia") {
-      setMensajeError("No tiene permisos para eliminar clientes.");
-      return;
-    }
-
-    setMensaje("");
-    setMensajeError("");
-
     try {
-      await clientesService.eliminarCliente(id);
-      setMensaje("Cliente eliminado correctamente");
-      setTimeout(() => {
-        navigate("/clientes");
-      }, 2000);
-    } catch (err) {
-      setMensajeError(err.response?.data?.message || "Error al eliminar cliente.");
+      const respuesta = await clientesService.eliminarCliente(id);
+
+      if (respuesta) {
+        setMensaje("Cliente eliminado correctamente");
+        setTimeout(() => {
+          navigate("/clientes");
+        }, 2000);
+      }
+    } catch {
+      setMensaje("Error al eliminar cliente");
     }
   };
   
@@ -78,7 +72,6 @@ const DetalleCliente = () => {
       <h1>Ficha del Cliente</h1>
 
       {mensaje && <p className = 'mensaje-eliminado'>{mensaje}</p>}
-      {mensajeError && <p className="mensaje-error">{mensajeError}</p>}
 
       <p>
         <strong>ID:</strong> {cliente.id}

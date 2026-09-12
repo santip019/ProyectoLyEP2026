@@ -1,16 +1,6 @@
 import axios from "axios";
 
 const URL = "https://fakestoreapi.com/users";
-const CLIENTES_ELIMINADOS_KEY = "clientesEliminados";
-
-const obtenerIdsEliminados = () => {
-    try {
-        const ids = JSON.parse(localStorage.getItem(CLIENTES_ELIMINADOS_KEY) || "[]");
-        return Array.isArray(ids) ? ids.map(String) : [];
-    } catch {
-        return [];
-    }
-};
 
 const crearCliente = async (cliente) => {
     const respuesta = await axios.post(URL, cliente);
@@ -19,8 +9,7 @@ const crearCliente = async (cliente) => {
 
 const getClientes = async () => {
     const respuesta = await axios.get(URL);
-    const idsEliminados = obtenerIdsEliminados();
-    return respuesta.data.filter((cliente) => !idsEliminados.includes(String(cliente.id)));
+    return respuesta.data;
 };
 
 const getClientePorId = async (id) => {
@@ -30,17 +19,7 @@ const getClientePorId = async (id) => {
 
 const eliminarCliente = async (id) => {
     const respuesta = await axios.delete(`${URL}/${id}`);
-    const idsEliminados = obtenerIdsEliminados();
-    const idComoString = String(id);
-
-    if (!idsEliminados.includes(idComoString)) {
-        localStorage.setItem(
-            CLIENTES_ELIMINADOS_KEY,
-            JSON.stringify([...idsEliminados, idComoString])
-        );
-    }
-
-    return respuesta.data ?? null;
+    return respuesta.data;
 };
 
 export default {
