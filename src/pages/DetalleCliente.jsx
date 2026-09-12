@@ -10,15 +10,21 @@ const DetalleCliente = () => {
 
   const [cliente, setCliente] = useState(null);
   const [mensaje, setMensaje] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const cargarCliente = async () => {
       try {
-        const data = await clientesService.getClientePorId(id);
-        setCliente(data);
-      } catch {
-        setError(true);
+        const res = await clientesService.getClientePorId(id);
+        if (!res || (res.ok !== undefined && !res.ok)) {
+          throw new Error('No se pudo encontrar el cliente solicitado (Error ' + (res?.status || 404) + ')');
+        }
+        setCliente(res);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
     cargarCliente();
@@ -34,17 +40,29 @@ const DetalleCliente = () => {
           navigate("/clientes");
         }, 2000);
       }
-    } catch (error) {
+    } catch {
       setMensaje("Error al eliminar cliente");
     }
   };
   
-  if (error) {
-    return <h2>Error al cargar el detalle del cliente.</h2>;
+  if (loading) {
+    return <h2>Cargando cliente...</h2>;
   }
 
-  if (!cliente) {
-    return <h2>Cargando cliente...</h2>;
+  if (error || !cliente) {
+    return (
+      <div className="container mt-4">
+        <div className="alert alert-danger" role="alert">
+          <p>{error || "Error al cargar el detalle del cliente."}</p>
+          <button
+            className="btn btn-primary"
+            onClick={() => navigate("/clientes")}
+          >
+            Volver a Clientes
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const enmascarar = (str) => '•'.repeat(str?.length || 8); //crea una mascara de puntos para la contraseña y que tenga un minimo de 8 caracteres
