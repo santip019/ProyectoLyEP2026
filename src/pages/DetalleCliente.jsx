@@ -16,10 +16,13 @@ const DetalleCliente = () => {
   useEffect(() => {
     const cargarCliente = async () => {
       try {
-        const data = await clientesService.getClientePorId(id);
-        setCliente(data);
+        const res = await clientesService.getClientePorId(id);
+        if (!res || (res.ok !== undefined && !res.ok)) {
+          throw new Error('No se pudo encontrar el cliente solicitado (Error ' + (res?.status || 404) + ')');
+        }
+        setCliente(res);
       } catch (err) {
-        setError(err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
