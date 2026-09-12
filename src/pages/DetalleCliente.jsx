@@ -13,6 +13,7 @@ const DetalleCliente = () => {
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     const cargarCliente = async () => {
@@ -32,17 +33,19 @@ const DetalleCliente = () => {
   }, [id]);
 
   const eliminarCliente = async () => {
-    try {
-      const respuesta = await clientesService.eliminarCliente(id);
+    if (admin?.sector?.trim() !== "Gerencia") {
+      setMensaje("No tienes permisos para eliminar clientes.");
+      return;
+    }
 
-      if (respuesta) {
-        setMensaje("Cliente eliminado correctamente");
-        setTimeout(() => {
-          navigate("/clientes");
-        }, 2000);
-      }
-    } catch {
-      setMensaje("Error al eliminar cliente");
+    setEliminando(true);
+    try {
+      await clientesService.eliminarCliente(id);
+      setMensaje("Cliente eliminado correctamente. Volviendo a la lista...");
+      setTimeout(() => navigate("/clientes"), 1500);
+    } catch (err) {
+      setMensaje(`No se pudo eliminar el cliente: ${err.message}`);
+      setEliminando(false);
     }
   };
   
@@ -120,8 +123,8 @@ const DetalleCliente = () => {
       </p>
 
       {admin?.sector?.trim() === "Gerencia" && (
-        <button className='btn-eliminar'onClick={eliminarCliente}>
-          Eliminar Cliente
+        <button className='btn-eliminar' onClick={eliminarCliente} disabled={eliminando}>
+          {eliminando ? "Eliminando..." : "Eliminar Cliente"}
         </button>
       )}
     </div>
