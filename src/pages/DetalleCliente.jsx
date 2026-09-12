@@ -40,7 +40,7 @@ const DetalleCliente = () => {
           navigate("/clientes");
         }, 2000);
       }
-    } catch (error) {
+    } catch {
       setMensaje("Error al eliminar cliente");
     }
   };
