@@ -10,15 +10,18 @@ const DetalleCliente = () => {
 
   const [cliente, setCliente] = useState(null);
   const [mensaje, setMensaje] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const cargarCliente = async () => {
       try {
         const data = await clientesService.getClientePorId(id);
         setCliente(data);
-      } catch {
-        setError(true);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
       }
     };
     cargarCliente();
