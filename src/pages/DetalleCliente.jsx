@@ -1,6 +1,7 @@
 import '../css/detallecliente.css';
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Button, Modal, Spinner } from "react-bootstrap";
 import clientesService from "../services/clientesService";
 import useAutorizaciones from "../hooks/useAutorizaciones";
 
@@ -13,6 +14,8 @@ const DetalleCliente = () => {
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [eliminando, setEliminando] = useState(false);
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
 
   useEffect(() => {
     const cargarCliente = async () => {
@@ -31,18 +34,25 @@ const DetalleCliente = () => {
     cargarCliente();
   }, [id]);
 
-  const eliminarCliente = async () => {
-    try {
-      const respuesta = await clientesService.eliminarCliente(id);
+  const solicitarEliminacion = () => {
+    if (admin?.sector?.trim() !== "Gerencia") {
+      setMensaje("No tienes permisos para eliminar clientes.");
+      return;
+    }
 
-      if (respuesta) {
-        setMensaje("Cliente eliminado correctamente");
-        setTimeout(() => {
-          navigate("/clientes");
-        }, 2000);
-      }
-    } catch {
-      setMensaje("Error al eliminar cliente");
+    setMostrarConfirmacion(true);
+  };
+
+  const eliminarCliente = async () => {
+    setMostrarConfirmacion(false);
+    setEliminando(true);
+    try {
+      await clientesService.eliminarCliente(id);
+      setMensaje("Cliente eliminado correctamente. Volviendo a la lista...");
+      setTimeout(() => navigate("/clientes"), 1500);
+    } catch (err) {
+      setMensaje(`No se pudo eliminar el cliente: ${err.message}`);
+      setEliminando(false);
     }
   };
   
@@ -120,10 +130,46 @@ const DetalleCliente = () => {
       </p>
 
       {admin?.sector?.trim() === "Gerencia" && (
-        <button className='btn-eliminar'onClick={eliminarCliente}>
-          Eliminar Cliente
+        <button className='btn-eliminar' onClick={solicitarEliminacion} disabled={eliminando}>
+          {eliminando ? (
+            <>
+              <Spinner animation="border" size="sm" role="status" />
+              <span className="texto-spinner">Eliminando...</span>
+            </>
+          ) : "Eliminar Cliente"}
         </button>
       )}
+
+      <Modal
+        show={mostrarConfirmacion}
+        onHide={() => setMostrarConfirmacion(false)}
+        centered
+        className="modal-confirmacion"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            ¿Está seguro de que desea eliminar al cliente{' '}
+            <strong>{cliente.name.firstname} {cliente.name.lastname}</strong>?
+          </p>
+          <span className="texto-advertencia">
+            Esta acción no se puede deshacer.
+          </span>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setMostrarConfirmacion(false)}
+          >
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={eliminarCliente}>
+            Sí, eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
